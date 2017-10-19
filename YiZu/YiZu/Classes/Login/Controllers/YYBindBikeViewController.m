@@ -16,6 +16,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.title = @"绑定车辆";
     // Do any additional setup after loading the view.
 }
 

@@ -76,6 +76,7 @@
 #define IS_IPHONE_6P (IS_IPHONE && SCREEN_MAX_LENGTH == 736.0)
 
 #define kTokenKey                @"kToken"               //用户的Token用于与服务器进行校验
+#define kTmpTokenKey             @"tmpToke"
 #define kUserInfoKey             @"UserInfo"
 #define kBikeStateKey            @"BikeStateKey"
 #define KBLEIDKey                @"bleIdKey"

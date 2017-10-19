@@ -160,6 +160,13 @@
 		0B9624A61F91B45F002E519C /* YYMineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B9624A51F91B45F002E519C /* YYMineViewController.m */; };
 		0B9624A91F91B77E002E519C /* YYMineMenuViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B9624A81F91B77E002E519C /* YYMineMenuViewCell.m */; };
 		0B96259B1F91FADE002E519C /* YYSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B96259A1F91FADE002E519C /* YYSettingViewController.m */; };
+		0BD19DF41F972536003488AB /* YYSendCodeRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DF31F9724C3003488AB /* YYSendCodeRequest.h */; };
+		0BD19DF51F972536003488AB /* YYSendCodeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DF21F9724C3003488AB /* YYSendCodeRequest.m */; };
+		0BD19DF81F9725B7003488AB /* YYLoginRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DF61F9725B7003488AB /* YYLoginRequest.m */; };
+		0BD19DF91F9725C9003488AB /* YYLoginRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DF71F9725B7003488AB /* YYLoginRequest.h */; };
+		0BD19DFC1F972E0E003488AB /* Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DFB1F972E0E003488AB /* Helper.m */; };
+		0BD19DFD1F972E17003488AB /* Helper.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DFA1F972E0D003488AB /* Helper.h */; };
+		0BD19E001F972EBB003488AB /* YYUserauthRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DFF1F972EBB003488AB /* YYUserauthRequest.m */; };
 		0BEA15C91F943A250025C702 /* YYSettingViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15C81F943A250025C702 /* YYSettingViewCell.m */; };
 		0BEA15CC1F943CE50025C702 /* YYBindBikeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15CB1F943CE50025C702 /* YYBindBikeViewController.m */; };
 		0BEA15CF1F9442670025C702 /* YYMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15CE1F9442670025C702 /* YYMessageViewController.m */; };
@@ -169,6 +176,7 @@
 		0BEA15DB1F944DE00025C702 /* YYMyWalletViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15DA1F944DE00025C702 /* YYMyWalletViewController.m */; };
 		0BEA15DE1F944FDD0025C702 /* YYConsumeRecordViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15DD1F944FDD0025C702 /* YYConsumeRecordViewCell.m */; };
 		0BEA15E11F94546E0025C702 /* YYChargeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15E01F94546E0025C702 /* YYChargeViewController.m */; };
+		0BEE87FD1F95EA170024F2D8 /* YYMapFindViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEE87FB1F95EA160024F2D8 /* YYMapFindViewController.m */; };
 		AD154952CD2D9AAF9AD7507A /* libPods-YiZu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93F941E60F0EE8F4B8BBEFCF /* libPods-YiZu.a */; };
 /* End PBXBuildFile section */
 
@@ -360,6 +368,14 @@
 		0B9624A81F91B77E002E519C /* YYMineMenuViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYMineMenuViewCell.m; sourceTree = "<group>"; };
 		0B9625991F91FADE002E519C /* YYSettingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYSettingViewController.h; sourceTree = "<group>"; };
 		0B96259A1F91FADE002E519C /* YYSettingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYSettingViewController.m; sourceTree = "<group>"; };
+		0BD19DF21F9724C3003488AB /* YYSendCodeRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYSendCodeRequest.m; sourceTree = "<group>"; };
+		0BD19DF31F9724C3003488AB /* YYSendCodeRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYSendCodeRequest.h; sourceTree = "<group>"; };
+		0BD19DF61F9725B7003488AB /* YYLoginRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYLoginRequest.m; sourceTree = "<group>"; };
+		0BD19DF71F9725B7003488AB /* YYLoginRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYLoginRequest.h; sourceTree = "<group>"; };
+		0BD19DFA1F972E0D003488AB /* Helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Helper.h; sourceTree = "<group>"; };
+		0BD19DFB1F972E0E003488AB /* Helper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Helper.m; sourceTree = "<group>"; };
+		0BD19DFE1F972EBB003488AB /* YYUserauthRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYUserauthRequest.h; sourceTree = "<group>"; };
+		0BD19DFF1F972EBB003488AB /* YYUserauthRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYUserauthRequest.m; sourceTree = "<group>"; };
 		0BEA15C71F943A250025C702 /* YYSettingViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYSettingViewCell.h; sourceTree = "<group>"; };
 		0BEA15C81F943A250025C702 /* YYSettingViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYSettingViewCell.m; sourceTree = "<group>"; };
 		0BEA15CA1F943CE50025C702 /* YYBindBikeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYBindBikeViewController.h; sourceTree = "<group>"; };
@@ -378,6 +394,8 @@
 		0BEA15DD1F944FDD0025C702 /* YYConsumeRecordViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYConsumeRecordViewCell.m; sourceTree = "<group>"; };
 		0BEA15DF1F94546E0025C702 /* YYChargeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYChargeViewController.h; sourceTree = "<group>"; };
 		0BEA15E01F94546E0025C702 /* YYChargeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYChargeViewController.m; sourceTree = "<group>"; };
+		0BEE87FB1F95EA160024F2D8 /* YYMapFindViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYMapFindViewController.m; sourceTree = "<group>"; };
+		0BEE87FC1F95EA170024F2D8 /* YYMapFindViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYMapFindViewController.h; sourceTree = "<group>"; };
 		4B438392D37AA429EE6B7080 /* Pods-YiZu.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YiZu.debug.xcconfig"; path = "Pods/Target Support Files/Pods-YiZu/Pods-YiZu.debug.xcconfig"; sourceTree = "<group>"; };
 		93F941E60F0EE8F4B8BBEFCF /* libPods-YiZu.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-YiZu.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0AF02E542DA50E93FCAC6C2 /* Pods-YiZu.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YiZu.release.xcconfig"; path = "Pods/Target Support Files/Pods-YiZu/Pods-YiZu.release.xcconfig"; sourceTree = "<group>"; };
@@ -723,6 +741,8 @@
 		0B6174241F908D69004D5E6B /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				0BD19DFA1F972E0D003488AB /* Helper.h */,
+				0BD19DFB1F972E0E003488AB /* Helper.m */,
 				0B6174251F908D69004D5E6B /* YYFileCacheManager.h */,
 				0B6174261F908D69004D5E6B /* YYBluetoothManager.h */,
 				0B6174271F908D69004D5E6B /* YYUserManager.h */,
@@ -886,6 +906,8 @@
 		0B6174F61F909955004D5E6B /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				0BEE87FC1F95EA170024F2D8 /* YYMapFindViewController.h */,
+				0BEE87FB1F95EA160024F2D8 /* YYMapFindViewController.m */,
 				0B806F7B1F94858200259E0A /* YYControlBikeViewController.h */,
 				0B806F7A1F94858100259E0A /* YYControlBikeViewController.m */,
 				0B6175071F90B3B9004D5E6B /* YYNaviViewController.h */,
@@ -922,6 +944,12 @@
 		0B6174FA1F909973004D5E6B /* Request */ = {
 			isa = PBXGroup;
 			children = (
+				0BD19DF71F9725B7003488AB /* YYLoginRequest.h */,
+				0BD19DF61F9725B7003488AB /* YYLoginRequest.m */,
+				0BD19DF31F9724C3003488AB /* YYSendCodeRequest.h */,
+				0BD19DF21F9724C3003488AB /* YYSendCodeRequest.m */,
+				0BD19DFE1F972EBB003488AB /* YYUserauthRequest.h */,
+				0BD19DFF1F972EBB003488AB /* YYUserauthRequest.m */,
 			);
 			path = Request;
 			sourceTree = "<group>";
@@ -1230,6 +1258,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BD19DFD1F972E17003488AB /* Helper.h in Sources */,
+				0BD19DF91F9725C9003488AB /* YYLoginRequest.h in Sources */,
+				0BD19DF41F972536003488AB /* YYSendCodeRequest.h in Sources */,
+				0BD19DF51F972536003488AB /* YYSendCodeRequest.m in Sources */,
 				0B806F8B1F94899B00259E0A /* MZTimerLabel.h in Sources */,
 				0B806F8C1F94899B00259E0A /* MZTimerLabel.m in Sources */,
 				0B806F891F94893F00259E0A /* YYOprateBikeRequest.h in Sources */,
@@ -1300,6 +1332,7 @@
 				0BEA15DE1F944FDD0025C702 /* YYConsumeRecordViewCell.m in Sources */,
 				0B6174AD1F908DF8004D5E6B /* NSDate+Compare.h in Sources */,
 				0B6174AE1F908DF8004D5E6B /* NSData+Encrypt.m in Sources */,
+				0BD19E001F972EBB003488AB /* YYUserauthRequest.m in Sources */,
 				0B6174AF1F908DF8004D5E6B /* NSData+Base64.m in Sources */,
 				0B6174B01F908DF8004D5E6B /* WSColorImageView.h in Sources */,
 				0B6174B11F908DF8004D5E6B /* XWImagePickerSheet.m in Sources */,
@@ -1322,7 +1355,9 @@
 				0B6174C01F908DF8004D5E6B /* MImaCell.xib in Sources */,
 				0B6174C11F908DF8004D5E6B /* MShowAllGroup.m in Sources */,
 				0B6174C21F908DF8004D5E6B /* MImaLibTool.m in Sources */,
+				0BEE87FD1F95EA170024F2D8 /* YYMapFindViewController.m in Sources */,
 				0B6174C31F908DF8004D5E6B /* MGroupCell.h in Sources */,
+				0BD19DF81F9725B7003488AB /* YYLoginRequest.m in Sources */,
 				0BEA15CC1F943CE50025C702 /* YYBindBikeViewController.m in Sources */,
 				0B6174C41F908DF8004D5E6B /* MShowGroupAllSet.h in Sources */,
 				0B6174C51F908DF8004D5E6B /* ImagePickerDefine.h in Sources */,
@@ -1364,6 +1399,7 @@
 				0B6174EA1F908DF8004D5E6B /* YYBluetoothManager.m in Sources */,
 				0B6174611F908DE2004D5E6B /* AppDelegate.h in Sources */,
 				0B6174621F908DE2004D5E6B /* AppDelegate.m in Sources */,
+				0BD19DFC1F972E0E003488AB /* Helper.m in Sources */,
 				0B6174631F908DE2004D5E6B /* YYPublishBaseViewController.m in Sources */,
 				0B6174641F908DE2004D5E6B /* XWPhotoCell.h in Sources */,
 				0B6174651F908DE2004D5E6B /* XWPhotoCell.m in Sources */,

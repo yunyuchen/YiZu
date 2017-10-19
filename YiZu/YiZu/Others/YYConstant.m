@@ -30,7 +30,7 @@ NSString *const kSiteRefreshNotifaction = @"SiteRefreshNotifaction";
 
 NSString *const kClickStartButtonNotifaction = @"ClickStartButtonNotifaction";
 
-NSString *const kBaseURL = @"http://zc.51xytu.com/";
+NSString *const kBaseURL = @"http://118.190.206.60/";
 
 NSString *const kRegisterAPI = @"open/get?module=UserService.register";
 

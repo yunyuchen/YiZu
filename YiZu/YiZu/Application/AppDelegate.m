@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 #import "QMUIConfigurationTemplate.h"
+#import "YYBaseRequest.h"
+#import "YYUserManager.h"
 #import <AMapFoundationKit/AMapFoundationKit.h>
 #import <QMUIKit.h>
 
@@ -26,9 +28,11 @@
     [AMapServices sharedServices].apiKey = kAMapKey;
     [[AMapServices sharedServices] setEnableHTTPS:NO];
     
-    QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
-    self.window.rootViewController = mainViewController;
-    
+    if ([YYUserManager isHaveLogin]) {
+        QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
+        self.window.rootViewController = mainViewController;
+    }
+
     return YES;
 }
 
