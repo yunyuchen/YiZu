@@ -28,7 +28,7 @@
     [AMapServices sharedServices].apiKey = kAMapKey;
     [[AMapServices sharedServices] setEnableHTTPS:NO];
     
-    if ([YYUserManager isHaveLogin]) {
+    if ([YYUserManager passCheck]) {
         QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
         self.window.rootViewController = mainViewController;
     }

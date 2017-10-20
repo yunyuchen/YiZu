@@ -82,29 +82,16 @@
         if (success) {
             QMUILog(@"%@",response);
             //记录用户Token
-            [YYFileCacheManager saveUserData:response[@"token"] forKey:kTmpTokenKey];
+            [YYUserManager saveToken:response[@"token"]];
             
-            YYBaseRequest *request = [[YYBaseRequest alloc] init];
-            request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kUserstateAPI];
-            [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
-                if (success) {
-                    QMUILog(@"%@",response);
-                    NSDictionary *dict = [NSDictionary nullDic:response];
-                    //用户认证通过
-                    if ([dict[@"state"] integerValue] == 1) {
-                        QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
-                        [UIApplication sharedApplication].keyWindow.rootViewController = mainViewController;
-                    }else{
-                        [weakSelf performSegueWithIdentifier:@"sesame" sender:weakSelf];
-                    }
-  
-                    //记录用户信息
-                    [YYFileCacheManager saveUserData:dict forKey:kUserInfoKey];
-                }
-            }];
-            
-            [weakSelf dismissViewControllerAnimated:YES completion:nil];
-            
+            NSDictionary *dict = [NSDictionary nullDic:response];
+            //用户认证通过
+            if ([dict[@"state"] integerValue] == 1) {
+                QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
+                [UIApplication sharedApplication].keyWindow.rootViewController = mainViewController;
+            }else{
+                [weakSelf performSegueWithIdentifier:@"sesame" sender:weakSelf];
+            }
         }else{
             [QMUITips showWithText:message inView:weakSelf.view hideAfterDelay:2];
         }

@@ -8,6 +8,7 @@
 
 #import "YYSettingViewController.h"
 #import "YYSettingViewCell.h"
+#import "YYUserManager.h"
 
 @interface YYSettingViewController ()<UITableViewDelegate,UITableViewDataSource>
 
@@ -55,10 +56,19 @@
 }
 
 - (IBAction)logoutButtonClick:(id)sender {
-    QMUINavigationController *loginViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"login"];
-    [UIApplication sharedApplication].keyWindow.rootViewController = loginViewController;
+    UIWindow *keyWindow =  [UIApplication sharedApplication].keyWindow;
+    QMUIAlertAction *action1 = [QMUIAlertAction actionWithTitle:@"取消" style:QMUIAlertActionStyleCancel handler:^(QMUIAlertAction *action) {
+    }];
+    QMUIAlertAction *action2 = [QMUIAlertAction actionWithTitle:@"确定" style:QMUIAlertActionStyleDestructive handler:^(QMUIAlertAction *action) {
+        [YYUserManager logout];
+        QMUINavigationController *loginViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"login"];
+        keyWindow.rootViewController = loginViewController;
+    }];
+    QMUIAlertController *alertController = [QMUIAlertController alertControllerWithTitle:@"提示" message:@"确定退出登录吗" preferredStyle:QMUIAlertControllerStyleAlert];
+    [alertController addAction:action1];
+    [alertController addAction:action2];
+    [alertController showWithAnimated:YES];
 }
-
 
 
 - (BOOL)shouldCustomNavigationBarTransitionIfBarHiddenable

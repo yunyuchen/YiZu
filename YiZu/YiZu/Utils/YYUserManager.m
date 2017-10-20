@@ -29,6 +29,14 @@
     return NO;
 }
 
++(BOOL)passCheck
+{
+    if ([YYFileCacheManager readUserDataForKey:kPassCheckKey]) {
+        return YES;
+    }
+    return NO;
+}
+
 /**
  *  记录用户token
  *
@@ -51,6 +59,8 @@
     [YYFileCacheManager removeUserDataForkey:kUserInfoKey];
     //清除token
     [YYFileCacheManager removeUserDataForkey:kTokenKey];
+    
+    [YYFileCacheManager removeUserDataForkey:kPassCheckKey];
     //发送退出通知
     [[NSNotificationCenter defaultCenter] postNotificationName:kLogoutSuccessNotification object:nil];
 }

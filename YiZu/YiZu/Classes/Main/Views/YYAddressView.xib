@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="YYAddressView">
+            <rect key="frame" x="0.0" y="0.0" width="366" height="120"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bBX-vw-MAF">
+                    <rect key="frame" x="12" y="18.5" width="115" height="83"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="115" id="Dcm-YE-6IN"/>
+                        <constraint firstAttribute="height" constant="83" id="nVN-Kk-vi8"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="111" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ubl-3O-LHR">
+                    <rect key="frame" x="139" y="18.5" width="215" height="18"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qGt-Bg-HFz" customClass="QMUIFillButton">
+                    <rect key="frame" x="267" y="74" width="87" height="27"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="87" id="NnY-aF-CqW"/>
+                        <constraint firstAttribute="height" constant="27" id="mdk-oV-aET"/>
+                    </constraints>
+                    <state key="normal" title="去还车"/>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="color" keyPath="fillColor">
+                            <color key="value" red="0.34901960780000002" green="0.74117647060000003" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="returnButtonClick:" destination="iN0-l3-epB" eventType="touchUpInside" id="A3u-Hm-AkG"/>
+                    </connections>
+                </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0Km" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bhd-Un-ifG">
+                    <rect key="frame" x="150" y="81" width="26" height="14.5"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25098039215686274" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="36站点icon" translatesAutoresizingMaskIntoConstraints="NO" id="E1w-UN-gjc">
+                    <rect key="frame" x="139" y="82.5" width="9" height="11"/>
+                </imageView>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="qGt-Bg-HFz" firstAttribute="bottom" secondItem="bBX-vw-MAF" secondAttribute="bottom" id="2bS-Vz-IHV"/>
+                <constraint firstItem="Bhd-Un-ifG" firstAttribute="centerY" secondItem="E1w-UN-gjc" secondAttribute="centerY" id="5LD-cI-LBn"/>
+                <constraint firstAttribute="trailing" secondItem="qGt-Bg-HFz" secondAttribute="trailing" constant="12" id="BI5-YB-c5J"/>
+                <constraint firstItem="E1w-UN-gjc" firstAttribute="leading" secondItem="ubl-3O-LHR" secondAttribute="leading" id="OZF-rb-lox"/>
+                <constraint firstItem="ubl-3O-LHR" firstAttribute="leading" secondItem="bBX-vw-MAF" secondAttribute="trailing" constant="12" id="SCz-UW-d73"/>
+                <constraint firstItem="bBX-vw-MAF" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="WMn-Nq-cFj"/>
+                <constraint firstItem="Bhd-Un-ifG" firstAttribute="leading" secondItem="E1w-UN-gjc" secondAttribute="trailing" constant="2" id="Z3R-oR-MWj"/>
+                <constraint firstItem="bBX-vw-MAF" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="12" id="bTb-jy-w1h"/>
+                <constraint firstAttribute="trailing" secondItem="ubl-3O-LHR" secondAttribute="trailing" constant="12" id="cqP-fB-ZZa"/>
+                <constraint firstItem="ubl-3O-LHR" firstAttribute="top" secondItem="bBX-vw-MAF" secondAttribute="top" id="eEo-aF-0KW"/>
+                <constraint firstItem="E1w-UN-gjc" firstAttribute="bottom" secondItem="bBX-vw-MAF" secondAttribute="bottom" constant="-8" id="tSB-6O-IMd"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="siteDistanceLabel" destination="Bhd-Un-ifG" id="hBO-P6-Fvd"/>
+                <outlet property="siteImageView" destination="bBX-vw-MAF" id="m7c-Bx-z7V"/>
+                <outlet property="siteNameLabel" destination="ubl-3O-LHR" id="hu5-03-gSK"/>
+            </connections>
+            <point key="canvasLocation" x="21" y="-222"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="36站点icon" width="9" height="11"/>
+    </resources>
+</document>

@@ -20,6 +20,8 @@
  */
 + (BOOL)isHaveLogin;
 
++ (BOOL)passCheck;
+
 /**
  *  获取用户基本信息
  */

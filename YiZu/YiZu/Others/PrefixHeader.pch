@@ -77,6 +77,7 @@
 
 #define kTokenKey                @"kToken"               //用户的Token用于与服务器进行校验
 #define kTmpTokenKey             @"tmpToke"
+#define kPassCheckKey            @"passCheck"
 #define kUserInfoKey             @"UserInfo"
 #define kBikeStateKey            @"BikeStateKey"
 #define KBLEIDKey                @"bleIdKey"
@@ -88,6 +89,6 @@
 //  获取沙箱文件
 #define GetFileInAppData(file) [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/AppData/%@",file]]
 #define GetFileInImgData(file) [NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/ImgData/%@",file]]
-#define kAMapKey @"9baac6113978a4d0ca9fb68d0806cb8b"
+#define kAMapKey @"c50b01b0be75f86ed6899bcd461a6f66"
 
 #endif /* PrefixHeader_pch */

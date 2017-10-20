@@ -19,6 +19,7 @@ pod 'AMap3DMap'
 pod 'AMapLocation'
 pod 'AMapSearch'
 pod 'BEMCheckBox'
+pod 'WechatOpenSDK'
 
 end
 

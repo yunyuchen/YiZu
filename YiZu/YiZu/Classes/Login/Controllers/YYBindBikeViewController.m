@@ -7,8 +7,12 @@
 //
 
 #import "YYBindBikeViewController.h"
+#import "YYBindBikeRequest.h"
+#import "YYFileCacheManager.h"
 
 @interface YYBindBikeViewController ()
+
+@property (weak, nonatomic) IBOutlet UITextField *bikeCodeTextField;
 
 @end
 
@@ -27,19 +31,38 @@
 }
 
 - (IBAction)nextButtonClick:(id)sender {
-    QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
-    [UIApplication sharedApplication].keyWindow.rootViewController = mainViewController;
+    YYBindBikeRequest *request = [[YYBindBikeRequest alloc] init];
+    request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kBindBikeAPI];
+    request.bcode = self.bikeCodeTextField.text;
+    __weak __typeof(self)weakSelf = self;
+    [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
+        if (success) {
+            if ([response integerValue] == 1) {
+                [YYFileCacheManager saveUserData:@"1" forKey:kPassCheckKey];
+                QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
+                [UIApplication sharedApplication].keyWindow.rootViewController = mainViewController;
+            }else{
+                [QMUITips showWithText:message inView:weakSelf.view hideAfterDelay:2];
+            }
+        }else{
+            [QMUITips showWithText:message inView:weakSelf.view hideAfterDelay:2];
+        }
+    } error:^(NSError *error) {
+        
+    }];
+    
+
 }
 
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (BOOL)shouldCustomNavigationBarTransitionIfBarHiddenable
+{
+    return YES;
 }
-*/
+
+-(BOOL) preferredNavigationBarHidden
+{
+    return NO;
+}
 
 @end

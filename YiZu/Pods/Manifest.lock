@@ -217,6 +217,7 @@ PODS:
   - SDWebImage (4.1.2):
     - SDWebImage/Core (= 4.1.2)
   - SDWebImage/Core (4.1.2)
+  - WechatOpenSDK (1.8.0)
   - WZLBadge (1.2.6)
   - ZBarSDK (1.3.1)
 
@@ -235,6 +236,7 @@ DEPENDENCIES:
   - MXParallaxHeader
   - QMUIKit
   - SDWebImage
+  - WechatOpenSDK
   - WZLBadge
 
 SPEC CHECKSUMS:
@@ -253,9 +255,10 @@ SPEC CHECKSUMS:
   MXParallaxHeader: 858c403532ed933b381556a81ce333d7065ad182
   QMUIKit: 337d8c689c36223bd78f85bed57a62af5ec6707a
   SDWebImage: cb6f9f266a9977741efcbc21e618e8be3734c774
+  WechatOpenSDK: 0ee07a8d492299d3e47372a33da5af26524a7576
   WZLBadge: 9ec779dcfd94c825518b395e8315fccaabff1bfa
   ZBarSDK: 4c1b5daeb7d6cc67dc9355e690af0230a661f6ec
 
-PODFILE CHECKSUM: 0c2f465ebb2ab439909fc93b6e3a4f0a8f4454af
+PODFILE CHECKSUM: 2d01e6f20e582f7a29f303d6a1c6d16801261b07
 
 COCOAPODS: 1.2.0

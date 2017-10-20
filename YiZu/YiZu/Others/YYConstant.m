@@ -175,4 +175,8 @@ NSString *const kGetDefaultAddAPI = @"get?module=EBService.getDefaultAdd";
 NSString *const kDelAddressAPI = @"get?module=EBService.delAddress";
 
 NSString *const kAppconfigAPI = @"open/get?module=UserService.appconfig";
+
+NSString *const kBindBikeAPI = @"get?module=UserService.bindBike";
+
+NSString *const kMySieteAPI = @"get?module=SiteService.mySite";
 @end

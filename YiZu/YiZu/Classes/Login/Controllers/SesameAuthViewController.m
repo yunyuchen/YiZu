@@ -40,7 +40,7 @@
         [QMUITips showWithText:@"请输入您的身份证" inView:self.view hideAfterDelay:2];
         return;
     }
-    if ([Helper justIdentityCard:self.idCardTextField.text.qmui_trim]) {
+    if (![Helper justIdentityCard:self.idCardTextField.text.qmui_trim]) {
         [QMUITips showWithText:@"请输入正确的身份证号码" inView:self.view hideAfterDelay:2];
         return;
     }
@@ -51,7 +51,14 @@
     __weak __typeof(self)weakSelf = self;
     [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
         if (success) {
-            [weakSelf performSegueWithIdentifier:@"next" sender:weakSelf];
+            QMUILog(@"%@",response);
+            if ([response integerValue] == 1) {
+                [weakSelf performSegueWithIdentifier:@"next" sender:weakSelf];
+            }else{
+               [QMUITips showWithText:message inView:weakSelf.view hideAfterDelay:2];
+            }
+        }else{
+            [QMUITips showWithText:message inView:weakSelf.view hideAfterDelay:2];
         }
     } error:^(NSError *error) {
         

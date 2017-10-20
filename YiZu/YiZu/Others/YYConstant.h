@@ -176,4 +176,8 @@ UIKIT_EXTERN NSString *const kGetDefaultAddAPI;
 UIKIT_EXTERN NSString *const kDelAddressAPI;
 //参数配置
 UIKIT_EXTERN NSString *const kAppconfigAPI;
+//绑定车辆
+UIKIT_EXTERN NSString *const kBindBikeAPI;
+//找到我的站点
+UIKIT_EXTERN NSString *const kMySieteAPI;
 @end
