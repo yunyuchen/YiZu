@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "YYRecordModel.h"
 
 @interface YYConsumeRecordViewCell : UITableViewCell
+
+@property(nonatomic, strong) YYRecordModel *model;
 
 @end

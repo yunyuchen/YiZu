@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "YYMsgModel.h"
 
 @interface YYMessageViewCell : UITableViewCell
+
+@property (nonatomic,strong) YYMsgModel *model;
 
 @end

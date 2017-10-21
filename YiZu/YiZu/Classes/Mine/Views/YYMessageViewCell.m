@@ -12,6 +12,10 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+
+@property (weak, nonatomic) IBOutlet UILabel *contentLabel;
+
 
 @end
 
@@ -29,6 +33,15 @@
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
+}
+
+-(void)setModel:(YYMsgModel *)model
+{
+    _model = model;
+    
+    self.titleLabel.text = model.title;
+    self.contentLabel.text = model.content;
+    self.timeLabel.text = model.ctime;
 }
 
 @end

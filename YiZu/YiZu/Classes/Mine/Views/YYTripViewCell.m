@@ -12,6 +12,12 @@
 
 @property (weak, nonatomic) IBOutlet UIView *bgView;
 
+@property (weak, nonatomic) IBOutlet UILabel *startNameLabel;
+
+@property (weak, nonatomic) IBOutlet UILabel *endNameLabel;
+
+@property (weak, nonatomic) IBOutlet UILabel *keepTimeLabel;
+
 @end
 
 @implementation YYTripViewCell
@@ -28,6 +34,16 @@
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
+}
+
+-(void)setModel:(YYDriveHisModel *)model
+{
+    _model = model;
+    
+    self.startNameLabel.text = model.sname;
+    self.endNameLabel.text = model.rname;
+    self.keepTimeLabel.text = [NSString stringWithFormat:@"行驶时间：%ld小时%ld分",model.keep / 60 ,model.keep % 60];
+    
 }
 
 @end

@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <QMUIKit.h>
 
-@interface YYReturnViewController : UIViewController
+@interface YYReturnViewController : QMUICommonViewController
 
 @end

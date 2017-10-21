@@ -19,20 +19,25 @@
 #import "YYOrderInfoView.h"
 #import "YYTips1View.h"
 #import "YYFileCacheManager.h"
+#import "YYBikeSiteModel.h"
 #import "YYFeedBackController.h"
 #import "YYFileCacheManager.h"
+#import "YYMySiteRequest.h"
+#import "MANaviRoute.h"
+#import "CommonUtility.h"
 #import <QMUIKit/QMUIKit.h>
 #import <MAMapKit/MAMapKit.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
 #import <AMapSearchKit/AMapSearchKit.h>
 
-@interface YYReturnViewController ()<MAMapViewDelegate,AMapSearchDelegate,AddressViewDelegate,OrderInfoViewDelegate,Tips1ViewDelegate,ScrollAddressViewDelegate>
+@interface YYReturnViewController ()<MAMapViewDelegate,AMapSearchDelegate,AddressViewDelegate,OrderInfoViewDelegate>
 
 @property (nonatomic, strong) MAAnnotationView *userLocationAnnotationView;
 
 @property (weak, nonatomic) IBOutlet UIView *topView;
 
-@property (weak, nonatomic) IBOutlet MAMapView *mapView;
+//地图
+@property(nonatomic, strong) MAMapView *mapView;
 
 @property (nonatomic, strong) NSMutableArray *annotations;
 
@@ -43,15 +48,6 @@
 @property (nonatomic,strong) NSArray<YYSiteModel *> *models;
 
 @property (weak, nonatomic) IBOutlet UIButton *gpsButton;
-
-/* 终点经纬度. */
-@property (nonatomic) CLLocationCoordinate2D destinationCoordinate;
-/* 用于显示当前路线方案. */
-@property (nonatomic) MANaviRoute * naviRoute;
-/* 当前路线方案索引值. */
-@property (nonatomic) NSInteger currentCourse;
-/* 路线方案个数. */
-@property (nonatomic) NSInteger totalCourse;
 
 @property (nonatomic, strong) AMapRoute *route;
 
@@ -64,12 +60,13 @@
 @property (nonatomic,strong) YYUserModel *userModel;
 
 @property (nonatomic,strong) QMUIModalPresentationViewController *modalPrentViewController;
+//站点信息
+@property(nonatomic, strong) NSArray<YYBikeSiteModel *> *bikeSiteModels;
+//上次位置
+@property (nonatomic,assign) CLLocationCoordinate2D lastPostion;
 
-@property (nonatomic,assign) BOOL flag;
-
-@property (nonatomic,assign) BOOL firstLoad;
-
-@property (nonatomic,weak) YYTips1View *tipsView;
+/* 用于显示当前路线方案. */
+@property (nonatomic) MANaviRoute * naviRoute;
 
 @end
 
@@ -77,76 +74,39 @@
 
 static NSString *reuseIndetifier = @"annotationReuseIndetifier";
 
--(NSArray<YYSiteModel *> *)models
+#pragma mark - lazyload
+-(NSArray<YYBikeSiteModel *> *)bikeSiteModels
 {
-    if (_models == nil) {
-        _models = [NSArray array];
+    if (_bikeSiteModels == nil) {
+        _bikeSiteModels = [NSMutableArray array];
     }
-    return _models;
+    return _bikeSiteModels;
 }
 
--(UIStatusBarStyle)preferredStatusBarStyle
-{
-    return UIStatusBarStyleLightContent;
-}
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
  
-    self.navigationItem.title = @"目的站点查询";
+    self.title = @"地图寻车";
     
     [self initMap];
     
     [self initAnnotations];
     
+    [self requestMySite];
+    
+    [self checkLocationAuth];
+    
     self.search = [[AMapSearchAPI alloc] init];
     self.search.delegate = self;
     
-    [self getUserInfoRequest];
-    
-    self.flag = NO;
-    self.firstLoad = YES;
-    
-    YYTips1View *tips1View = [[YYTips1View alloc] init];
-    tips1View.delegate = self;
-    tips1View.frame = CGRectMake(0, 74, kScreenWidth, 158);
-    tips1View.hidden = YES;
-    self.tipsView = tips1View;
-    [self.view addSubview:self.tipsView];
-    // Do any additional setup after loading the view.
-}
-
-
-# pragma mark 初始化地图
--(void) initMap
-{
-    [AMapServices sharedServices].apiKey = kAMapKey;
-    
-    _mapView.delegate                    = self;
-    _mapView.showsUserLocation           = YES;
-    _mapView.cameraDegree = 0;
-    _mapView.userTrackingMode            = MAUserTrackingModeFollow;
-    _mapView.rotateCameraEnabled       = NO;
-    _mapView.skyModelEnable              = YES;
-    _mapView.showsCompass                = NO;
-    _mapView.showsScale                  = NO;
-    _mapView.rotateEnabled               = NO;
-
-    [_mapView setZoomLevel:16.5 animated:YES];
-    
-    [self.view bringSubviewToFront:self.topView];
-    [self.view bringSubviewToFront:self.gpsButton];
-    [self.view bringSubviewToFront:self.tipsView];
-    
-    YYScrollAddressView *addressView = [[YYScrollAddressView alloc] initWithFrame:CGRectMake(0, kScreenHeight - 130, kScreenWidth, 120)];
-    [self.view addSubview:addressView];
-    [self.view bringSubviewToFront:addressView];
-    addressView.imgVLeft.delegate = self;
-    addressView.imgVRight.delegate = self;
-    addressView.imgVCenter.delegate = self;
-    addressView.delegate = self;
-    self.addressView = addressView;
-    self.addressView.hidden = YES;
+//    YYTips1View *tips1View = [[YYTips1View alloc] init];
+//    tips1View.delegate = self;
+//    tips1View.frame = CGRectMake(0, 74, kScreenWidth, 158);
+//    tips1View.hidden = YES;
+//    self.tipsView = tips1View;
+//    [self.view addSubview:self.tipsView];
 }
 
 - (void)initAnnotations
@@ -158,109 +118,101 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     self.pickImageView = pickImageView;
 }
 
--(void) getAroundSiteRequest
+#pragma mark - 监测系统权限
+- (void) checkLocationAuth
 {
-    YYAroundSiteRequest *request = [[YYAroundSiteRequest alloc] init];
-    request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kAroundSiteAPI];
+    if ([CLLocationManager locationServicesEnabled] && ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined || [CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorized)) {
+    }else if ([CLLocationManager authorizationStatus] ==kCLAuthorizationStatusDenied) {
+        QMUIAlertAction *action1 = [QMUIAlertAction actionWithTitle:@"取消" style:QMUIAlertActionStyleCancel handler:^(QMUIAlertAction *action) {
+        }];
+        QMUIAlertAction *action2 = [QMUIAlertAction actionWithTitle:@"确定" style:QMUIAlertActionStyleDestructive handler:^(QMUIAlertAction *action) {
+            NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+            if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                [[UIApplication sharedApplication] openURL:url];
+            }
+        }];
+        QMUIAlertController *alertController = [QMUIAlertController alertControllerWithTitle:@"温馨提示" message:@"请您设置允许APP访问您的定位->设置->隐私->定位" preferredStyle:QMUIAlertControllerStyleAlert];
+        [alertController addAction:action1];
+        [alertController addAction:action2];
+        [alertController showWithAnimated:YES];
+    }
+}
+
+
+#pragma mark - 地图放大、缩小、定位
+- (IBAction)mapPlusButtonClick:(id)sender {
+    [self.mapView setZoomLevel:self.mapView.zoomLevel + 1 animated:YES];
+}
+
+- (IBAction)mapDecreaseButtonClick:(id)sender {
+    [self.mapView setZoomLevel:self.mapView.zoomLevel - 1 animated:YES];
+}
+
+- (IBAction)userLocationButtonClick:(id)sender {
+    QMUILog(@"latitude = %f, longitude = %f",self.mapView.userLocation.coordinate.latitude,self.mapView.userLocation.coordinate.longitude);
+    [self.mapView setCenterCoordinate:self.mapView.userLocation.location.coordinate animated:YES];
     
+    [self requestMySite];
+}
+
+# pragma mark 初始化地图
+-(void) initMap
+{
+    [AMapServices sharedServices].apiKey = kAMapKey;
+    
+    MAMapView *mapView = [[MAMapView alloc] initWithFrame:self.view.bounds];
+    mapView.delegate = self;
+    mapView.showsUserLocation = YES;
+    mapView.cameraDegree = 0;
+    mapView.userTrackingMode = MAUserTrackingModeFollow;
+    mapView.rotateCameraEnabled = NO;
+    mapView.skyModelEnable = YES;
+    mapView.showsCompass = NO;
+    mapView.showsScale = NO;
+    mapView.rotateEnabled  = NO;
+    [mapView setZoomLevel:18.5 animated:YES];
+    [self.view insertSubview:mapView atIndex:0];
+    
+    self.mapView = mapView;
+    
+    [self initAnnotations];
+}
+
+
+-(void) requestMySite
+{
+    YYMySiteRequest *request = [[YYMySiteRequest alloc] init];
+    request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kMySieteAPI];
     CLLocationCoordinate2D coordinate = [self.mapView convertPoint:self.pickImageView.center toCoordinateFromView:self.mapView];
-    
     request.lat = coordinate.latitude;
     request.lng = coordinate.longitude;
-    
-    __weak __typeof(self)weak_self = self;
+    __weak __typeof(self)weakSelf = self;
     [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
         if (success) {
-            weak_self.models = [YYSiteModel modelArrayWithDictArray:response];
-            weak_self.addressView.models = weak_self.models;
-            if (weak_self.models.count > 0) {
-                weak_self.addressView.hidden = NO;
-            }else{
-                weak_self.addressView.hidden = YES;
-            }
-            [weak_self.mapView removeAnnotations:weak_self.annotations];
-            weak_self.annotations = [NSMutableArray array];
+            QMUILog(@"YYMySiteRequest ---- %@",response);
+            weakSelf.lastPostion = coordinate;
+            weakSelf.bikeSiteModels = [YYBikeSiteModel modelArrayWithDictArray:response];
+            [weakSelf.mapView removeAnnotations:weakSelf.annotations];
+            weakSelf.annotations = [NSMutableArray array];
             
-            for (int i = 0; i < weak_self.models.count; ++i)
+            for (int i = 0; i < weakSelf.bikeSiteModels.count; ++i)
             {
                 MAPointAnnotation *a1 = [[MAPointAnnotation alloc] init];
-                a1.coordinate = CLLocationCoordinate2DMake(weak_self.models[i].latitude, weak_self.models[i].longitude);
-                a1.title      = [NSString stringWithFormat:@"%d", i];
-                a1.subtitle = weak_self.models[i].address;
-                [weak_self.annotations addObject:a1];
+                a1.coordinate = CLLocationCoordinate2DMake(weakSelf.bikeSiteModels[i].latitude, weakSelf.bikeSiteModels[i].longitude);
+                [weakSelf.annotations addObject:a1];
                 
-            }
-            if (weak_self.annotations.count > 0) {
-                
-                [weak_self.mapView addAnnotations:weak_self.annotations];
-    
             }
             
-            if (self.annotations.count > 0) {
-                [self.mapView selectAnnotation:self.annotations[0] animated:YES];
+            if (weakSelf.annotations.count > 0) {
+                [weakSelf.mapView addAnnotations:self.annotations];
             }
-            if (weak_self.models.count > 0 && weak_self.firstLoad) {
-                YYOrderInfoView *orderInfoView = [[YYOrderInfoView alloc] init];
-                orderInfoView.rsid = weak_self.models[0].ID;
-                orderInfoView.userModel = weak_self.userModel;
-                orderInfoView.delegate = weak_self;
-                orderInfoView.siteName = weak_self.models[0].name;
-                
-                YYOrderInfoRequest *request = [[YYOrderInfoRequest alloc] init];
-                request.rsid = weak_self.models[0].ID;
-                
-                request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kOrderPriceAPI];
-               
-                [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
-                    if (success) {
-                        orderInfoView.resultModel = [YYReturnResultModel modelWithDictionary:response];
-                        QMUIModalPresentationViewController *modalViewController = [[QMUIModalPresentationViewController alloc] init];
-                        modalViewController.contentView = orderInfoView;
-                        modalViewController.maximumContentViewWidth = kScreenWidth;
-                        modalViewController.animationStyle = QMUIModalPresentationAnimationStyleFade;
-                        [modalViewController showWithAnimated:YES completion:nil];
-                        weak_self.modalPrentViewController = modalViewController;
-                    }else{
-                        if (self.models.count > 0) {
-                            //1.将两个经纬度点转成投影点
-                            MAMapPoint point1 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weak_self.models[0].latitude,weak_self.models[0].longitude));
-                            MAMapPoint point2 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weak_self.mapView.userLocation.coordinate.latitude,weak_self.mapView.userLocation.coordinate.longitude));
-                            //2.计算距离
-                            CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
-                            weak_self.tipsView.distanceLabel.text = [NSString stringWithFormat:@"%.0f",distance];
-                            weak_self.tipsView.addressLabel.text = weak_self.models[weak_self.selectedId].name;
-                            weak_self.tipsView.hidden = NO;
-                            [weak_self.view bringSubviewToFront:weak_self.tipsView];
-                        }
-                    }
-                } error:^(NSError *error) {
-                    
-                }];
-           
-                weak_self.firstLoad = NO;
-            }
-            
+        }else{
+            [QMUITips showWithText:message inView:weakSelf.view hideAfterDelay:2];
         }
     } error:^(NSError *error) {
         
     }];
     
-}
-
-
-
-
--(void) showRoute
-{
-    AMapWalkingRouteSearchRequest *navi = [[AMapWalkingRouteSearchRequest alloc] init];
-    /* 出发点. */
-    navi.origin = [AMapGeoPoint locationWithLatitude:self.mapView.userLocation.coordinate.latitude
-                                           longitude:self.mapView.userLocation.coordinate.longitude];
-    /* 目的地. */
-    navi.destination = [AMapGeoPoint locationWithLatitude:self.destinationCoordinate.latitude
-                                                longitude:self.destinationCoordinate.longitude];
-    [self.search AMapWalkingRouteSearch:navi];
-
 }
 
 
@@ -273,18 +225,15 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     if ([view.annotation isKindOfClass:[MAUserLocation class]])
     {
         MAUserLocationRepresentation *pre = [[MAUserLocationRepresentation alloc] init];
-        pre.image = [UIImage imageNamed:@"08定位02"];
-        
+        pre.image = [UIImage imageNamed:@"myself_icon"];
         [self.mapView updateUserLocationRepresentation:pre];
-        
         view.calloutOffset = CGPointMake(0, 0);
         view.canShowCallout = NO;
         self.userLocationAnnotationView = view;
-        
         [self.mapView setCenterCoordinate:self.mapView.userLocation.location.coordinate animated:YES];
+        
+        
     }
-    
-  
 }
 
 - (void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation updatingLocation:(BOOL)updatingLocation
@@ -295,6 +244,7 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
             
             double degree = userLocation.heading.trueHeading;
             self.userLocationAnnotationView.transform = CGAffineTransformMakeRotation(degree * M_PI / 180.f );
+            
         }];
     }
     
@@ -311,10 +261,12 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
             annotationView = [[MAAnnotationView alloc] initWithAnnotation:annotation
                                                           reuseIdentifier:reuseIndetifier];
         }
-        annotationView.image = [UIImage imageNamed:@"07车辆"];
+        annotationView.image = [UIImage imageNamed:@"cai_dingwei"];
+        
         if ([annotation isKindOfClass:[MAUserLocation class]]){
-            annotationView.image = [UIImage imageNamed:@"08定位02"];
+            annotationView.image = [UIImage imageNamed:@"myself_icon"];
         }
+        
         // 设置为NO，用以调用自定义的calloutView
         annotationView.canShowCallout = NO;
         //设置中心点偏移，使得标注底部中间点成为经纬度对应点
@@ -322,42 +274,22 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
         //annotationView.selected = YES;
         return annotationView;
     }
+    
     return nil;
 }
-
-- (void)mapView:(MAMapView *)mapView didSelectAnnotationView:(MAAnnotationView *)view
-{
-    if (![view.annotation isKindOfClass:[MAUserLocation class]]) {
-        
-        CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.y"];
-        CGFloat currentTx = view.transform.ty;
-        animation.duration = 1.0;
-        CGFloat height = 10;
-        animation.values = @[@(currentTx), @(currentTx - height),@(currentTx)];
-        animation.keyTimes = @[ @(0), @(0.6),@(1.0)];
-        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-        [view.layer addAnimation:animation forKey:@"kViewShakerAnimationKey"];
-        self.selectedId = [view.annotation.title integerValue];
-        self.destinationCoordinate = view.annotation.coordinate;
-        
-        [self showRoute];
-        
-          self.tipsView.hidden = YES;
-        
-        [self.addressView setInfoByCurrentModelIndex:self.selectedId];
-        if (self.flag) {
-            return;
-        }
-      
-        self.flag = YES;
-    }
-    
-}
-
 
 -(void)mapView:(MAMapView *)mapView mapDidMoveByUser:(BOOL)wasUserAction
 {
     CLLocationCoordinate2D coordinate = [self.mapView convertPoint:self.pickImageView.center toCoordinateFromView:self.mapView];
+    
+    //1.将两个经纬度点转成投影点
+    MAMapPoint point1 = MAMapPointForCoordinate(self.lastPostion);
+    MAMapPoint point2 = MAMapPointForCoordinate(coordinate);
+    //2.计算距离
+    CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
+    if (distance < 2000) {
+        return;
+    }
     
     CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.y"];
     CGFloat currentTx = self.pickImageView.transform.ty;
@@ -368,18 +300,103 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [self.pickImageView.layer addAnimation:animation forKey:@"kViewShakerAnimationKey"];
     
-    [self getAroundSiteRequest];
+    [self requestMySite];
     
-    AMapReGeocodeSearchRequest *regeo = [[AMapReGeocodeSearchRequest alloc] init];
+}
+
+- (void)mapView:(MAMapView *)mapView didSelectAnnotationView:(MAAnnotationView *)view
+{
+    if (![view.annotation isKindOfClass:[MAUserLocation class]]) {
+        [view setSelected:NO animated:NO];
+        CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.y"];
+        CGFloat currentTx = view.transform.ty;
+        animation.duration = 1.0;
+        CGFloat height = 10;
+        animation.values = @[@(currentTx), @(currentTx - height),@(currentTx)];
+        animation.keyTimes = @[ @(0), @(0.6),@(1.0)];
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [view.layer addAnimation:animation forKey:@"kViewShakerAnimationKey"];
     
-    regeo.location                    = [AMapGeoPoint locationWithLatitude:coordinate.latitude longitude:coordinate.longitude];
-    regeo.requireExtension            = YES;
-    [self.search AMapReGoecodeSearch:regeo];
+        AMapWalkingRouteSearchRequest *navi = [[AMapWalkingRouteSearchRequest alloc] init];
+        
+        /* 出发点. */
+        navi.origin = [AMapGeoPoint locationWithLatitude:self.mapView.userLocation.coordinate.latitude
+                                               longitude:self.mapView.userLocation.coordinate.longitude];
+        /* 目的地. */
+        navi.destination = [AMapGeoPoint locationWithLatitude:self.bikeSiteModels[0].latitude
+                                                    longitude:self.bikeSiteModels[0].longitude];
+        
+        [self.search AMapWalkingRouteSearch:navi];
+        
+        
+        YYOrderInfoView *orderInfoView = [[YYOrderInfoView alloc] init];
+        orderInfoView.rsid = self.bikeSiteModels[0].ID;
+        orderInfoView.userModel = self.userModel;
+        orderInfoView.delegate = self;
+        orderInfoView.siteName = self.bikeSiteModels[0].name;
+        
+        YYOrderInfoRequest *request = [[YYOrderInfoRequest alloc] init];
+        request.rsid = self.models[self.selectedId].ID;
+        request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kOrderPriceAPI];
+        __weak __typeof(self)weakSelf = self;
+        [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
+            if (success) {
+                UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
+                contentView.backgroundColor = UIColorWhite;
+                contentView.layer.cornerRadius = 6;
+                
+                orderInfoView.resultModel = [YYReturnResultModel modelWithDictionary:response];
+                QMUIModalPresentationViewController *modalViewController = [[QMUIModalPresentationViewController alloc] init];
+                modalViewController.contentView = orderInfoView;
+                modalViewController.maximumContentViewWidth = kScreenWidth;
+                modalViewController.animationStyle = QMUIModalPresentationAnimationStyleFade;
+                weakSelf.modalPrentViewController = modalViewController;
+                [modalViewController showWithAnimated:YES completion:nil];
+            }else{
+                if (self.bikeSiteModels.count > 0) {
+                    //1.将两个经纬度点转成投影点
+                    MAMapPoint point1 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weakSelf.bikeSiteModels[0].latitude,weakSelf.bikeSiteModels[0].longitude));
+                    MAMapPoint point2 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weakSelf.mapView.userLocation.coordinate.latitude,weakSelf.mapView.userLocation.coordinate.longitude));
+                    //2.计算距离
+                    CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
+                    QMUILog(@"distance ===== %.f",distance);
+                    YYTips1View *tipsView = [[YYTips1View alloc] init];
+                    tipsView.distanceLabel.text = [NSString stringWithFormat:@"再骑%.0f米到达还车点",distance];
+                    UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
+                    contentView.backgroundColor = UIColorWhite;
+                    contentView.layer.cornerRadius = 6;
+                    QMUIModalPresentationViewController *modalViewController = [[QMUIModalPresentationViewController alloc] init];
+                    modalViewController.contentView = tipsView;
+                    modalViewController.maximumContentViewWidth = kScreenWidth;
+                    modalViewController.animationStyle = QMUIModalPresentationAnimationStyleFade;
+                    weakSelf.modalPrentViewController = modalViewController;
+                    [modalViewController showWithAnimated:YES completion:nil];
+                }
+                
+            }
+        } error:^(NSError *error) {
+            
+        }];
+    }
     
-    if (self.flag) {
+}
+
+
+/* 路径规划搜索回调. */
+- (void)onRouteSearchDone:(AMapRouteSearchBaseRequest *)request response:(AMapRouteSearchResponse *)response
+{
+    if (response.route == nil)
+    {
         return;
     }
-    self.flag = NO;
+    [self.naviRoute removeFromMapView];
+    self.route = response.route;
+    MANaviAnnotationType type = MANaviAnnotationTypeWalking;
+    self.naviRoute = [MANaviRoute naviRouteForPath:self.route.paths[0] withNaviType:type showTraffic:YES startPoint:[AMapGeoPoint locationWithLatitude:self.mapView.userLocation.coordinate.latitude longitude:self.mapView.userLocation.coordinate.longitude ] endPoint:[AMapGeoPoint locationWithLatitude:self.bikeSiteModels[0].latitude longitude:self.bikeSiteModels[0].longitude]];
+    [self.naviRoute addToMapView:self.mapView];
+    [self.mapView setVisibleMapRect:[CommonUtility mapRectForOverlays:self.naviRoute.routePolylines]
+                        edgePadding:UIEdgeInsetsMake(20, 20, 20, 20)
+                           animated:YES];
 }
 
 
@@ -389,7 +406,8 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     if ([overlay isKindOfClass:[LineDashPolyline class]])
     {
         MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:((LineDashPolyline *)overlay).polyline];
-        polylineRenderer.lineWidth   = 8;
+        polylineRenderer.strokeImage = [UIImage imageNamed:@"arrowTexture"];
+        polylineRenderer.lineWidth   = 4;
         polylineRenderer.lineDash = YES;
         polylineRenderer.strokeColor = [UIColor redColor];
         
@@ -399,8 +417,8 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     {
         MANaviPolyline *naviPolyline = (MANaviPolyline *)overlay;
         MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:naviPolyline.polyline];
-        
-        polylineRenderer.lineWidth = 8;
+        polylineRenderer.strokeImage = [UIImage imageNamed:@"arrowTexture"];
+        polylineRenderer.lineWidth = 4;
         
         if (naviPolyline.type == MANaviAnnotationTypeWalking)
         {
@@ -433,199 +451,14 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
 }
 
 
-#pragma mark - AMapSearchDelegate
-
-- (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
+- (BOOL)shouldCustomNavigationBarTransitionIfBarHiddenable
 {
-    if (response.regeocode != nil)
-    {
-       
-    }
+    return YES;
 }
 
-
-/* 路径规划搜索回调. */
-- (void)onRouteSearchDone:(AMapRouteSearchBaseRequest *)request response:(AMapRouteSearchResponse *)response
+-(BOOL) preferredNavigationBarHidden
 {
-    if (response.route == nil)
-    {
-        return;
-    }
-    [self.naviRoute removeFromMapView];
-    self.route = response.route;
-    [self updateTotal];
-    self.currentCourse = 0;
-    MANaviAnnotationType type = MANaviAnnotationTypeWalking;
-    self.naviRoute = [MANaviRoute naviRouteForPath:self.route.paths[self.currentCourse] withNaviType:type showTraffic:YES startPoint:[AMapGeoPoint locationWithLatitude:self.mapView.userLocation.coordinate.latitude longitude:self.mapView.userLocation.coordinate.longitude ] endPoint:[AMapGeoPoint locationWithLatitude:self.destinationCoordinate.latitude longitude:self.destinationCoordinate.longitude]];
-    [self.naviRoute addToMapView:self.mapView];
-    
-    /* 缩放地图使其适应polylines的展示. */
-//    [self.mapView setVisibleMapRect:[CommonUtility mapRectForOverlays:self.naviRoute.routePolylines]
-//                        edgePadding:UIEdgeInsetsMake(RoutePlanningPaddingEdge, RoutePlanningPaddingEdge, RoutePlanningPaddingEdge, RoutePlanningPaddingEdge)
-//                           animated:YES];
-}
-
-- (void)updateTotal
-{
-    self.totalCourse = self.route.paths.count;
-}
-
-- (void)mapView:(MAMapView *)mapView didSingleTappedAtCoordinate:(CLLocationCoordinate2D)coordinate {
-    self.tipsView.hidden = YES;
-}
-
--(void)addressView:(YYAddressView *)addressView didClickReturnButton:(UIButton *)returnButton
-{
-    YYOrderInfoView *orderInfoView = [[YYOrderInfoView alloc] init];
-    orderInfoView.rsid = addressView.model.ID;
-    orderInfoView.userModel = self.userModel;
-    orderInfoView.delegate = self;
-    orderInfoView.siteName = addressView.model.name;
-
-    YYOrderInfoRequest *request = [[YYOrderInfoRequest alloc] init];
-    request.rsid = self.models[self.selectedId].ID;
-    request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kOrderPriceAPI];
-    __weak __typeof(self)weak_self = self;
-    [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
-        if (success) {
-            UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
-            contentView.backgroundColor = UIColorWhite;
-            contentView.layer.cornerRadius = 6;
-    
-            orderInfoView.resultModel = [YYReturnResultModel modelWithDictionary:response];
-            QMUIModalPresentationViewController *modalViewController = [[QMUIModalPresentationViewController alloc] init];
-            modalViewController.contentView = orderInfoView;
-            modalViewController.maximumContentViewWidth = kScreenWidth;
-            modalViewController.animationStyle = QMUIModalPresentationAnimationStyleFade;
-            weak_self.modalPrentViewController = modalViewController;
-            [modalViewController showWithAnimated:YES completion:nil];
-            weak_self.firstLoad = NO;
-        }else{
-            if (self.models.count > 0) {
-                //1.将两个经纬度点转成投影点
-                MAMapPoint point1 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weak_self.models[0].latitude,weak_self.models[0].longitude));
-                MAMapPoint point2 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weak_self.mapView.userLocation.coordinate.latitude,weak_self.mapView.userLocation.coordinate.longitude));
-                //2.计算距离
-                CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
-                self.tipsView.distanceLabel.text = [NSString stringWithFormat:@"%.0f",distance];
-                self.tipsView.addressLabel.text = self.models[self.selectedId].name;
-                self.tipsView.hidden = NO;
-            }
-          
-        }
-    } error:^(NSError *error) {
-        
-    }];
-}
-
-//获取用户状态信息
--(void) getUserInfoRequest
-{
-    YYBaseRequest *request = [[YYBaseRequest alloc] init];
-    request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kUserstateAPI];
-    
-    __weak __typeof(self)weakSelf = self;
-    [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
-        if (success) {
-            weakSelf.userModel = [YYUserModel modelWithDictionary:response];
-            
-            
-        }
-    } error:^(NSError *error) {
-        
-    }];
-}
-
--(void)orderInfoView:(YYOrderInfoView *)orderView didClickOKButton:(UIButton *)sender
-{
-    [self.modalPrentViewController hideWithAnimated:YES completion:^(BOOL finished) {
-        YYReturnBikeRequest *request = [[YYReturnBikeRequest alloc] init];
-        request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kReturnBikeAPI];
-        request.rsid = orderView.rsid;
-        __weak __typeof(self)weak_self = self;
-        QMUITips *tips = [QMUITips createTipsToView:self.view];
-        QMUIToastContentView *contentView = (QMUIToastContentView *)tips.contentView;
-        contentView.minimumSize = CGSizeMake(100, 100);
-        [tips showLoading];
-        [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
-            [tips hideAnimated:YES];
-            if (success) {
-                weak_self.resultModel = [YYReturnResultModel modelWithDictionary:response];
-                QMUITips *tips = [QMUITips createTipsToView:[UIApplication sharedApplication].keyWindow];
-                QMUIToastContentView *contentView = (QMUIToastContentView *)tips.contentView;
-                contentView.minimumSize = CGSizeMake(200, 100);
-                [tips showSucceed:@"还车成功" hideAfterDelay:2];
-                [YYFileCacheManager removeUserDataForkey:KBLEIDKey];
-                if (weak_self.resultModel.price >= 3) {
-                       [[NSNotificationCenter defaultCenter] postNotificationName:kReturnSuccessNotification object:nil];
-                }
-                [YYFileCacheManager saveUserData:@"0" forKey:kBikeStateKey];
-                //[weak_self.navigationController popToRootViewControllerAnimated:YES];
-                [weak_self.navigationController popToViewController:[weak_self.navigationController.viewControllers objectAtIndex:1] animated:YES];
-            }else{
-                if ([message isEqualToString:@"车辆不在站点, 请到指定站点还车"]) {
-                    if (self.models.count > 0) {
-                        //1.将两个经纬度点转成投影点
-                        MAMapPoint point1 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weak_self.models[0].latitude,weak_self.models[0].longitude));
-                        MAMapPoint point2 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weak_self.mapView.userLocation.coordinate.latitude,weak_self.mapView.userLocation.coordinate.longitude));
-                        //2.计算距离
-                        CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
-                        self.tipsView.distanceLabel.text = [NSString stringWithFormat:@"%.0f",distance];
-                        self.tipsView.addressLabel.text = self.models[0].name;
-                        self.tipsView.hidden = NO;
-                    }
-                }else{
-                    [QMUITips showError:message inView:self.view hideAfterDelay:2];
-                }
-           
-
-            }
-        } error:^(NSError *error) {
-            [tips hideAnimated:YES];
-        }];
-    }];
-}
-
--(void) navScrollView:(YYScrollAddressView *)scrollView didSelectCurrentModel:(YYSiteModel *)model
-{
-    for (int i = 0; i < self.annotations.count; i++) {
-        if ([((MAPointAnnotation *)self.annotations[i]).subtitle isEqualToString:model.address]) {
-            [self.mapView selectAnnotation:self.annotations[i] animated:YES];
-            break;
-        }
-    }
-}
-
--(void)orderInfoView:(YYOrderInfoView *)orderView didClickCloseButton:(UIButton *)sender
-{
-    [self.modalPrentViewController hideWithAnimated:YES completion:^(BOOL finished) {
-
-    }];
-}
-
--(void)YYTips1View:(YYTips1View *)tipsView didClickCloseButton:(UIButton *)closeButton
-{
-    [self.modalPrentViewController hideWithAnimated:YES completion:^(BOOL finished) {
-    
-    }];
-
-}
-
--(void)YYTips1View:(YYTips1View *)tipsView didClickReturnButton:(UIButton *)returnButton
-{
-    [self.modalPrentViewController hideWithAnimated:YES completion:^(BOOL finished) {
-        [self.navigationController popViewControllerAnimated:YES];
-    }];
-
-}
-
--(void)YYTips1View:(YYTips1View *)tipsView didClickFeedBackButton:(UIButton *)feedBackButton
-{
-    YYFeedBackController *feedBackViewController = [[YYFeedBackController alloc] init];
-    feedBackViewController.lon = self.mapView.userLocation.coordinate.longitude;
-    feedBackViewController.lat = self.mapView.userLocation.coordinate.latitude;
-    feedBackViewController.rsid = self.models[self.selectedId].ID;
-    [self.navigationController pushViewController:feedBackViewController animated:YES];
+    return NO;
 }
 
 @end

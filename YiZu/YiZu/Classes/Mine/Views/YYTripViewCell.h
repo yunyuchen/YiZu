@@ -7,7 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "YYDriveHisModel.h"
 
 @interface YYTripViewCell : UITableViewCell
+
+@property(nonatomic, strong) YYDriveHisModel *model;
 
 @end

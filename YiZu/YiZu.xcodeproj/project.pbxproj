@@ -207,6 +207,22 @@
 		0BD19DFC1F972E0E003488AB /* Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DFB1F972E0E003488AB /* Helper.m */; };
 		0BD19DFD1F972E17003488AB /* Helper.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DFA1F972E0D003488AB /* Helper.h */; };
 		0BD19E001F972EBB003488AB /* YYUserauthRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BD19DFF1F972EBB003488AB /* YYUserauthRequest.m */; };
+		0BDFB7671F9997760057A5AA /* YYMsgModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7661F9997760057A5AA /* YYMsgModel.m */; };
+		0BDFB76A1F999AC30057A5AA /* YYDriveHisModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7691F999AC30057A5AA /* YYDriveHisModel.m */; };
+		0BDFB76D1F99A0D60057A5AA /* YYRecordModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB76C1F99A0D60057A5AA /* YYRecordModel.m */; };
+		0BDFB77C1F99C1C00057A5AA /* WXApiManager.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB76F1F99C1A10057A5AA /* WXApiManager.h */; };
+		0BDFB77D1F99C1C00057A5AA /* WXApiResponseHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7701F99C1A10057A5AA /* WXApiResponseHandler.m */; };
+		0BDFB77E1F99C1C00057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7711F99C1A10057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BDFB77F1F99C1C00057A5AA /* WXApiRequestHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7721F99C1A10057A5AA /* WXApiRequestHandler.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BDFB7801F99C1C00057A5AA /* WXMediaMessage+messageConstruct.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7731F99C1A10057A5AA /* WXMediaMessage+messageConstruct.h */; };
+		0BDFB7811F99C1C00057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7751F99C1A10057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BDFB7821F99C1C00057A5AA /* WXMediaMessage+messageConstruct.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7761F99C1A10057A5AA /* WXMediaMessage+messageConstruct.m */; };
+		0BDFB7831F99C1C00057A5AA /* WXApiRequestHandler.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7771F99C1A10057A5AA /* WXApiRequestHandler.h */; };
+		0BDFB7841F99C1C00057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7781F99C1A10057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.h */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BDFB7851F99C1C00057A5AA /* WXApiResponseHandler.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7791F99C1A10057A5AA /* WXApiResponseHandler.h */; };
+		0BDFB7861F99C1C00057A5AA /* WXApiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB77A1F99C1A10057A5AA /* WXApiManager.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		0BDFB7871F99C1C00057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.h in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB77B1F99C1A10057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.h */; };
+		0BDFB78A1F99C3A30057A5AA /* YYCreateBlanceRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BDFB7891F99C3A30057A5AA /* YYCreateBlanceRequest.m */; };
 		0BEA15C91F943A250025C702 /* YYSettingViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15C81F943A250025C702 /* YYSettingViewCell.m */; };
 		0BEA15CC1F943CE50025C702 /* YYBindBikeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15CB1F943CE50025C702 /* YYBindBikeViewController.m */; };
 		0BEA15CF1F9442670025C702 /* YYMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BEA15CE1F9442670025C702 /* YYMessageViewController.m */; };
@@ -472,6 +488,27 @@
 		0BD19DFB1F972E0E003488AB /* Helper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Helper.m; sourceTree = "<group>"; };
 		0BD19DFE1F972EBB003488AB /* YYUserauthRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYUserauthRequest.h; sourceTree = "<group>"; };
 		0BD19DFF1F972EBB003488AB /* YYUserauthRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYUserauthRequest.m; sourceTree = "<group>"; };
+		0BDFB7651F9997760057A5AA /* YYMsgModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYMsgModel.h; sourceTree = "<group>"; };
+		0BDFB7661F9997760057A5AA /* YYMsgModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYMsgModel.m; sourceTree = "<group>"; };
+		0BDFB7681F999AC30057A5AA /* YYDriveHisModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYDriveHisModel.h; sourceTree = "<group>"; };
+		0BDFB7691F999AC30057A5AA /* YYDriveHisModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYDriveHisModel.m; sourceTree = "<group>"; };
+		0BDFB76B1F99A0D60057A5AA /* YYRecordModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYRecordModel.h; sourceTree = "<group>"; };
+		0BDFB76C1F99A0D60057A5AA /* YYRecordModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYRecordModel.m; sourceTree = "<group>"; };
+		0BDFB76F1F99C1A10057A5AA /* WXApiManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXApiManager.h; sourceTree = "<group>"; };
+		0BDFB7701F99C1A10057A5AA /* WXApiResponseHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXApiResponseHandler.m; sourceTree = "<group>"; };
+		0BDFB7711F99C1A10057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "GetMessageFromWXResp+responseWithTextOrMediaMessage.m"; sourceTree = "<group>"; };
+		0BDFB7721F99C1A10057A5AA /* WXApiRequestHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXApiRequestHandler.m; sourceTree = "<group>"; };
+		0BDFB7731F99C1A10057A5AA /* WXMediaMessage+messageConstruct.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "WXMediaMessage+messageConstruct.h"; sourceTree = "<group>"; };
+		0BDFB7741F99C1A10057A5AA /* Constant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constant.h; sourceTree = "<group>"; };
+		0BDFB7751F99C1A10057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SendMessageToWXReq+requestWithTextOrMediaMessage.m"; sourceTree = "<group>"; };
+		0BDFB7761F99C1A10057A5AA /* WXMediaMessage+messageConstruct.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "WXMediaMessage+messageConstruct.m"; sourceTree = "<group>"; };
+		0BDFB7771F99C1A10057A5AA /* WXApiRequestHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXApiRequestHandler.h; sourceTree = "<group>"; };
+		0BDFB7781F99C1A10057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GetMessageFromWXResp+responseWithTextOrMediaMessage.h"; sourceTree = "<group>"; };
+		0BDFB7791F99C1A10057A5AA /* WXApiResponseHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WXApiResponseHandler.h; sourceTree = "<group>"; };
+		0BDFB77A1F99C1A10057A5AA /* WXApiManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WXApiManager.m; sourceTree = "<group>"; };
+		0BDFB77B1F99C1A10057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SendMessageToWXReq+requestWithTextOrMediaMessage.h"; sourceTree = "<group>"; };
+		0BDFB7881F99C3A30057A5AA /* YYCreateBlanceRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYCreateBlanceRequest.h; sourceTree = "<group>"; };
+		0BDFB7891F99C3A30057A5AA /* YYCreateBlanceRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYCreateBlanceRequest.m; sourceTree = "<group>"; };
 		0BEA15C71F943A250025C702 /* YYSettingViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYSettingViewCell.h; sourceTree = "<group>"; };
 		0BEA15C81F943A250025C702 /* YYSettingViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YYSettingViewCell.m; sourceTree = "<group>"; };
 		0BEA15CA1F943CE50025C702 /* YYBindBikeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYBindBikeViewController.h; sourceTree = "<group>"; };
@@ -875,6 +912,7 @@
 		0B6174311F908D69004D5E6B /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				0BDFB76E1F99C1A10057A5AA /* WXHelper */,
 				0BC993E01F98831800FA1F41 /* AlipaySDK.bundle */,
 				0BC993C81F98822000FA1F41 /* AlipaySDK.framework */,
 				0B806F7D1F94866600259E0A /* MZTimerLabel */,
@@ -1159,6 +1197,12 @@
 		0B9624A01F91B452002E519C /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				0BDFB7651F9997760057A5AA /* YYMsgModel.h */,
+				0BDFB7661F9997760057A5AA /* YYMsgModel.m */,
+				0BDFB7681F999AC30057A5AA /* YYDriveHisModel.h */,
+				0BDFB7691F999AC30057A5AA /* YYDriveHisModel.m */,
+				0BDFB76B1F99A0D60057A5AA /* YYRecordModel.h */,
+				0BDFB76C1F99A0D60057A5AA /* YYRecordModel.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1166,6 +1210,8 @@
 		0B9624A11F91B452002E519C /* Request */ = {
 			isa = PBXGroup;
 			children = (
+				0BDFB7881F99C3A30057A5AA /* YYCreateBlanceRequest.h */,
+				0BDFB7891F99C3A30057A5AA /* YYCreateBlanceRequest.m */,
 			);
 			path = Request;
 			sourceTree = "<group>";
@@ -1208,6 +1254,26 @@
 				0BEA15DD1F944FDD0025C702 /* YYConsumeRecordViewCell.m */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		0BDFB76E1F99C1A10057A5AA /* WXHelper */ = {
+			isa = PBXGroup;
+			children = (
+				0BDFB76F1F99C1A10057A5AA /* WXApiManager.h */,
+				0BDFB7701F99C1A10057A5AA /* WXApiResponseHandler.m */,
+				0BDFB7711F99C1A10057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.m */,
+				0BDFB7721F99C1A10057A5AA /* WXApiRequestHandler.m */,
+				0BDFB7731F99C1A10057A5AA /* WXMediaMessage+messageConstruct.h */,
+				0BDFB7741F99C1A10057A5AA /* Constant.h */,
+				0BDFB7751F99C1A10057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.m */,
+				0BDFB7761F99C1A10057A5AA /* WXMediaMessage+messageConstruct.m */,
+				0BDFB7771F99C1A10057A5AA /* WXApiRequestHandler.h */,
+				0BDFB7781F99C1A10057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.h */,
+				0BDFB7791F99C1A10057A5AA /* WXApiResponseHandler.h */,
+				0BDFB77A1F99C1A10057A5AA /* WXApiManager.m */,
+				0BDFB77B1F99C1A10057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.h */,
+			);
+			path = WXHelper;
 			sourceTree = "<group>";
 		};
 		2F0E2CE819EB2B345E1E1490 /* Frameworks */ = {
@@ -1423,6 +1489,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0BDFB77C1F99C1C00057A5AA /* WXApiManager.h in Sources */,
+				0BDFB77D1F99C1C00057A5AA /* WXApiResponseHandler.m in Sources */,
+				0BDFB77E1F99C1C00057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.m in Sources */,
+				0BDFB77F1F99C1C00057A5AA /* WXApiRequestHandler.m in Sources */,
+				0BDFB7801F99C1C00057A5AA /* WXMediaMessage+messageConstruct.h in Sources */,
+				0BDFB7811F99C1C00057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.m in Sources */,
+				0BDFB7821F99C1C00057A5AA /* WXMediaMessage+messageConstruct.m in Sources */,
+				0BDFB7831F99C1C00057A5AA /* WXApiRequestHandler.h in Sources */,
+				0BDFB7841F99C1C00057A5AA /* GetMessageFromWXResp+responseWithTextOrMediaMessage.h in Sources */,
+				0BDFB7851F99C1C00057A5AA /* WXApiResponseHandler.h in Sources */,
+				0BDFB7861F99C1C00057A5AA /* WXApiManager.m in Sources */,
+				0BDFB7871F99C1C00057A5AA /* SendMessageToWXReq+requestWithTextOrMediaMessage.h in Sources */,
 				0BC993BA1F98428400FA1F41 /* YYAddressView.h in Sources */,
 				0BC993BB1F98428400FA1F41 /* YYAddressView.m in Sources */,
 				0BC993BC1F98428400FA1F41 /* YYAddressView.xib in Sources */,
@@ -1437,6 +1515,7 @@
 				0BD19DFD1F972E17003488AB /* Helper.h in Sources */,
 				0BD19DF91F9725C9003488AB /* YYLoginRequest.h in Sources */,
 				0BD19DF41F972536003488AB /* YYSendCodeRequest.h in Sources */,
+				0BDFB7671F9997760057A5AA /* YYMsgModel.m in Sources */,
 				0BD19DF51F972536003488AB /* YYSendCodeRequest.m in Sources */,
 				0B806F8B1F94899B00259E0A /* MZTimerLabel.h in Sources */,
 				0B806F8C1F94899B00259E0A /* MZTimerLabel.m in Sources */,
@@ -1477,6 +1556,7 @@
 				0B61748F1F908DF8004D5E6B /* UITabBarController+AddChildVC.h in Sources */,
 				0B6174901F908DF8004D5E6B /* NSData+CRC32.h in Sources */,
 				0B6174911F908DF8004D5E6B /* NSData+CRC32.m in Sources */,
+				0BDFB76D1F99A0D60057A5AA /* YYRecordModel.m in Sources */,
 				0B6174921F908DF8004D5E6B /* NSURL+Parameters.h in Sources */,
 				0B806F761F947A6900259E0A /* YYWebViewController.m in Sources */,
 				0B6174931F908DF8004D5E6B /* NSDictionary+Params.m in Sources */,
@@ -1511,6 +1591,7 @@
 				0B6174A81F908DF8004D5E6B /* NSNotificationCenter+Addition.h in Sources */,
 				0B6174A91F908DF8004D5E6B /* NSNotificationCenter+Addition.m in Sources */,
 				0B6174AA1F908DF8004D5E6B /* NSDate+Compare.m in Sources */,
+				0BDFB78A1F99C3A30057A5AA /* YYCreateBlanceRequest.m in Sources */,
 				0BC9939C1F98407300FA1F41 /* YYReturnResultModel.m in Sources */,
 				0B6174AB1F908DF8004D5E6B /* NSData+Encrypt.h in Sources */,
 				0B6174AC1F908DF8004D5E6B /* NSData+Base64.h in Sources */,
@@ -1573,6 +1654,7 @@
 				0BC993851F983EF400FA1F41 /* YYReturnViewController.m in Sources */,
 				0B6174D91F908DF8004D5E6B /* YYRequestManager.m in Sources */,
 				0B6174DA1F908DF8004D5E6B /* YYBaseRequest.h in Sources */,
+				0BDFB76A1F999AC30057A5AA /* YYDriveHisModel.m in Sources */,
 				0BC993911F983FDB00FA1F41 /* CommonUtility.m in Sources */,
 				0BC9938E1F983FA100FA1F41 /* YYSiteModel.m in Sources */,
 				0B6174DE1F908DF8004D5E6B /* main.m in Sources */,

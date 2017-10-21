@@ -11,10 +11,13 @@
 #import "YYCreateOrderRequest.h"
 #import "YYBikeSiteModel.h"
 #import "YYUserModel.h"
+#import "MANaviRoute.h"
+#import "CommonUtility.h"
+#import <AMapSearchKit/AMapSearchKit.h>
 #import <MAMapKit/MAMapKit.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
 
-@interface YYNaviViewController ()<MAMapViewDelegate>
+@interface YYNaviViewController ()<MAMapViewDelegate,AMapSearchDelegate>
 //顶部View
 @property (weak, nonatomic) IBOutlet UIView *topView;
 //地图
@@ -35,6 +38,13 @@
 @property (weak, nonatomic) IBOutlet UILabel *bikeNoLabel;
 //用户信息
 @property(nonatomic, strong) YYUserModel *userModel;
+//搜索
+@property(nonatomic, strong) AMapSearchAPI *search;
+
+/* 用于显示当前路线方案. */
+@property (nonatomic) MANaviRoute * naviRoute;
+
+@property (nonatomic, strong) AMapRoute *route;
 @end
 
 static NSString *reuseIndetifier = @"annotationReuseIndetifier";
@@ -60,6 +70,10 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     [self initMap];
     
     [self checkLocationAuth];
+    
+    //初始化搜索
+    self.search = [[AMapSearchAPI alloc] init];
+    self.search.delegate = self;
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -78,6 +92,9 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
         if (success) {
             weakSelf.userModel = [YYUserModel modelWithDictionary:response];
             weakSelf.bikeNoLabel.text = [NSString stringWithFormat:@"%ld",weakSelf.userModel.deviceid];
+            if ([weakSelf.userModel.hasorder isEqualToString:@"0"]) {
+                [weakSelf performSegueWithIdentifier:@"use" sender:weakSelf];
+            }
         }
     } error:^(NSError *error) {
         
@@ -311,6 +328,104 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     [self requestMySite];
     
 }
+
+- (void)mapView:(MAMapView *)mapView didSelectAnnotationView:(MAAnnotationView *)view
+{
+    if (![view.annotation isKindOfClass:[MAUserLocation class]]) {
+        [view setSelected:NO animated:NO];
+        CAKeyframeAnimation * animation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.y"];
+        CGFloat currentTx = view.transform.ty;
+        animation.duration = 1.0;
+        CGFloat height = 10;
+        animation.values = @[@(currentTx), @(currentTx - height),@(currentTx)];
+        animation.keyTimes = @[ @(0), @(0.6),@(1.0)];
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        [view.layer addAnimation:animation forKey:@"kViewShakerAnimationKey"];
+        
+        AMapWalkingRouteSearchRequest *navi = [[AMapWalkingRouteSearchRequest alloc] init];
+        
+        /* 出发点. */
+        navi.origin = [AMapGeoPoint locationWithLatitude:self.mapView.userLocation.coordinate.latitude
+                                               longitude:self.mapView.userLocation.coordinate.longitude];
+        /* 目的地. */
+        navi.destination = [AMapGeoPoint locationWithLatitude:self.bikeSiteModels[0].latitude
+                                                    longitude:self.bikeSiteModels[0].longitude];
+        
+        [self.search AMapWalkingRouteSearch:navi];
+        
+    }
+    
+}
+
+
+/* 路径规划搜索回调. */
+- (void)onRouteSearchDone:(AMapRouteSearchBaseRequest *)request response:(AMapRouteSearchResponse *)response
+{
+    if (response.route == nil)
+    {
+        return;
+    }
+    [self.naviRoute removeFromMapView];
+    self.route = response.route;
+    MANaviAnnotationType type = MANaviAnnotationTypeWalking;
+    self.naviRoute = [MANaviRoute naviRouteForPath:self.route.paths[0] withNaviType:type showTraffic:YES startPoint:[AMapGeoPoint locationWithLatitude:self.mapView.userLocation.coordinate.latitude longitude:self.mapView.userLocation.coordinate.longitude ] endPoint:[AMapGeoPoint locationWithLatitude:self.bikeSiteModels[0].latitude longitude:self.bikeSiteModels[0].longitude]];
+    [self.naviRoute addToMapView:self.mapView];
+        [self.mapView setVisibleMapRect:[CommonUtility mapRectForOverlays:self.naviRoute.routePolylines]
+                            edgePadding:UIEdgeInsetsMake(20, 20, 20, 20)
+                               animated:YES];
+}
+
+
+//绘制遮盖时执行的代理方法
+- (MAOverlayRenderer *)mapView:(MAMapView *)mapView rendererForOverlay:(id <MAOverlay>)overlay
+{
+    if ([overlay isKindOfClass:[LineDashPolyline class]])
+    {
+        MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:((LineDashPolyline *)overlay).polyline];
+        polylineRenderer.strokeImage = [UIImage imageNamed:@"arrowTexture"];
+        polylineRenderer.lineWidth   = 4;
+        polylineRenderer.lineDash = YES;
+        polylineRenderer.strokeColor = [UIColor redColor];
+        
+        return polylineRenderer;
+    }
+    if ([overlay isKindOfClass:[MANaviPolyline class]])
+    {
+        MANaviPolyline *naviPolyline = (MANaviPolyline *)overlay;
+        MAPolylineRenderer *polylineRenderer = [[MAPolylineRenderer alloc] initWithPolyline:naviPolyline.polyline];
+        polylineRenderer.strokeImage = [UIImage imageNamed:@"arrowTexture"];
+        polylineRenderer.lineWidth = 4;
+        
+        if (naviPolyline.type == MANaviAnnotationTypeWalking)
+        {
+            polylineRenderer.strokeColor = self.naviRoute.walkingColor;
+        }
+        else if (naviPolyline.type == MANaviAnnotationTypeRailway)
+        {
+            polylineRenderer.strokeColor = self.naviRoute.railwayColor;
+        }
+        else
+        {
+            polylineRenderer.strokeColor = self.naviRoute.routeColor;
+        }
+        
+        return polylineRenderer;
+    }
+    if ([overlay isKindOfClass:[MAMultiPolyline class]])
+    {
+        MAMultiColoredPolylineRenderer * polylineRenderer = [[MAMultiColoredPolylineRenderer alloc] initWithMultiPolyline:overlay];
+        
+        polylineRenderer.lineWidth = 10;
+        polylineRenderer.strokeColors = [self.naviRoute.multiPolylineColors copy];
+        polylineRenderer.gradient = YES;
+        
+        return polylineRenderer;
+    }
+    
+    return nil;
+    
+}
+
 
 #pragma mark - QMUINavigationBarDelegate
 

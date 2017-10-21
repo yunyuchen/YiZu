@@ -87,6 +87,7 @@
             NSDictionary *dict = [NSDictionary nullDic:response];
             //用户认证通过
             if ([dict[@"state"] integerValue] == 1) {
+                [YYFileCacheManager saveUserData:@"1" forKey:kPassCheckKey];
                 QMUINavigationController *mainViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"main"];
                 [UIApplication sharedApplication].keyWindow.rootViewController = mainViewController;
             }else{

@@ -8,6 +8,16 @@
 
 #import "YYConsumeRecordViewCell.h"
 
+@interface YYConsumeRecordViewCell()
+
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+
+@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
+
+@property (weak, nonatomic) IBOutlet UILabel *priceLabel;
+
+@end
+
 @implementation YYConsumeRecordViewCell
 
 - (void)awakeFromNib {
@@ -19,6 +29,15 @@
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
+}
+
+-(void)setModel:(YYRecordModel *)model
+{
+    _model = model;
+    
+    self.titleLabel.text = model.des;
+    self.timeLabel.text = model.ctime;
+    self.priceLabel.text = [NSString stringWithFormat:@"%.2f 元"];
 }
 
 @end

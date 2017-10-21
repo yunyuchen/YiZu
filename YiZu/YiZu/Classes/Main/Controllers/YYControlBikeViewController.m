@@ -60,6 +60,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *bikeNameLabel;
 
+@property (weak, nonatomic) IBOutlet UIView *bikeNoBgView;
 
 @property (nonatomic,strong) QMUIModalPresentationViewController *modalPrentViewController;
 
@@ -69,15 +70,34 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    [self createUI];
+    
+    self.manager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue() options:@{CBCentralManagerOptionShowPowerAlertKey:@YES}];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(buttonClickAction:) name:kClickStartButtonNotifaction object:nil];
+    
+    //添加通知(处理从后台进来后的情况)
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveBackgroundNoti) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    //UIApplicationDidBecomeActiveNotification
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(test) name:UIApplicationDidBecomeActiveNotification object:nil];
+}
+
+
+- (void) createUI
+{
     self.mapButton.imagePosition = QMUIButtonImagePositionTop;
     self.soundButton.imagePosition = QMUIButtonImagePositionTop;
     self.mapButton.spacingBetweenImageAndTitle = 10;
     self.soundButton.spacingBetweenImageAndTitle = 10;
     self.middleView.layer.cornerRadius = 4;
     self.middleView.layer.masksToBounds = YES;
+    self.bikeNoBgView.layer.cornerRadius = 12;
+    self.bikeNoBgView.layer.masksToBounds = YES;
     self.deviceLabel.text = [NSString stringWithFormat:@"ID:%ld",(long)self.deviceid];
     self.last_mileageLabek.text = [NSString stringWithFormat:@"%.1f",self.last_mileage];
-    self.bikeNameLabel.text = self.name; 
+    self.bikeNameLabel.text = self.name;
     self.driveTimeLabel.timeFormat = @"HH mm";
     if (self.ctime != nil) {
         NSDate *startDate = [NSDate dateWithString:self.ctime formatString:@"yyyy-MM-dd HH:mm:ss"];
@@ -85,7 +105,7 @@
         [self.driveTimeLabel setCountDownTime:time];
     }
     [self.driveTimeLabel start];
-
+    
     if ([[YYFileCacheManager readUserDataForKey:kBikeStateKey] isEqualToString:@"0"] || [YYFileCacheManager readUserDataForKey:kBikeStateKey] == nil) {
         self.startButton.selected = YES;
         self.tipsLabel.text = @"已开启";
@@ -109,15 +129,6 @@
         self.startButtonHeightCons.constant = 150;
     }
     
-    self.manager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue() options:@{CBCentralManagerOptionShowPowerAlertKey:@YES}];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(buttonClickAction:) name:kClickStartButtonNotifaction object:nil];
-    
-    //添加通知(处理从后台进来后的情况)
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveBackgroundNoti) name:UIApplicationWillEnterForegroundNotification object:nil];
-    
-    //UIApplicationDidBecomeActiveNotification
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(test) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 -(void) test
@@ -170,20 +181,11 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
-    
     [self.manager scanForPeripheralsWithServices:nil options:nil];
     
     [self requestOrderInfo];
 }
 
-
-//视图将要消失
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    [self.navigationController setNavigationBarHidden:NO animated:NO];
-}
 
 //操作车辆op->指令信息
 -(void) operateBike:(NSString *)op
@@ -341,11 +343,11 @@
 
 //扫描到设备会进入方法
 -(void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI{
-    if (kFetchBLEId == nil) {
+    if (self.rentalModel == nil) {
         return;
     }
     
-    NSData *data =[kFetchBLEId dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data =[self.rentalModel.bleid dataUsingEncoding:NSUTF8StringEncoding];
     
     uLong crc = crc32(0L, Z_NULL, 0);
     
@@ -463,7 +465,7 @@
         }
         if ([hexStr isEqualToString:@"03910293"]) {//未注册
             NSDictionary *userInfo = [YYFileCacheManager readUserDataForKey:kUserInfoKey];
-            NSData *data =[kFetchBLEId dataUsingEncoding:NSUTF8StringEncoding];
+            NSData *data =[self.rentalModel.bleid dataUsingEncoding:NSUTF8StringEncoding];
             uLong crc = crc32(0L, Z_NULL, 0);
             crc = crc32(crc, data.bytes, data.length);
             NSData *resultData = [self little_intToByteWithData:crc andLength:4];
