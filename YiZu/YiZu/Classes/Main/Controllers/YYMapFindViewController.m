@@ -101,6 +101,22 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     [self initAnnotations];
 }
 
+#pragma mark - 地图放大、缩小、定位
+- (IBAction)mapPlusButtonClick:(id)sender {
+    [self.mapView setZoomLevel:self.mapView.zoomLevel + 1 animated:YES];
+}
+
+- (IBAction)mapDecreaseButtonClick:(id)sender {
+    [self.mapView setZoomLevel:self.mapView.zoomLevel - 1 animated:YES];
+}
+
+- (IBAction)userLocationButtonClick:(id)sender {
+    QMUILog(@"latitude = %f, longitude = %f",self.mapView.userLocation.coordinate.latitude,self.mapView.userLocation.coordinate.longitude);
+    [self.mapView setCenterCoordinate:self.mapView.userLocation.location.coordinate animated:YES];
+    
+    [self requestMySite];
+}
+
 
 - (void)initAnnotations
 {

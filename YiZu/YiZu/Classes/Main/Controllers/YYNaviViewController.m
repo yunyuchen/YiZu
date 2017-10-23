@@ -88,7 +88,9 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     YYBaseRequest *request = [[YYBaseRequest alloc] init];
     request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kUserstateAPI];
     __weak __typeof(self)weakSelf = self;
+    [QMUITips showLoadingInView:self.view];
     [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
+        [QMUITips hideAllToastInView:self.view animated:YES];
         if (success) {
             weakSelf.userModel = [YYUserModel modelWithDictionary:response];
             weakSelf.bikeNoLabel.text = [NSString stringWithFormat:@"%ld",weakSelf.userModel.deviceid];
@@ -97,7 +99,7 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
             }
         }
     } error:^(NSError *error) {
-        
+         [QMUITips hideAllToastInView:self.view animated:YES];
     }];
     
 }

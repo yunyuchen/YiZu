@@ -12,5 +12,6 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *distanceLabel;
 
+@property(nonatomic, copy) void (^feedBackBlock)(void);
 
 @end

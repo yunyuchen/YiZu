@@ -7,6 +7,7 @@
 //
 
 #import "YYTips1View.h"
+#import <QMUIKit.h>
 
 @implementation YYTips1View
 
@@ -22,7 +23,15 @@
 }
 
 
+- (IBAction)closeButtonClick:(id)sender {
+    [QMUIModalPresentationViewController hideAllVisibleModalPresentationViewControllerIfCan];
+}
 
+- (IBAction)feedButtonClick:(id)sender {
+    if (self.feedBackBlock) {
+        self.feedBackBlock();
+    }
+}
 
 
 @end

@@ -25,6 +25,8 @@
 #import "YYMySiteRequest.h"
 #import "MANaviRoute.h"
 #import "CommonUtility.h"
+#import "YYFeedBackController.h"
+#import "UIimageView+WebCache.h"
 #import <QMUIKit/QMUIKit.h>
 #import <MAMapKit/MAMapKit.h>
 #import <AMapFoundationKit/AMapFoundationKit.h>
@@ -68,6 +70,17 @@
 /* 用于显示当前路线方案. */
 @property (nonatomic) MANaviRoute * naviRoute;
 
+@property (weak, nonatomic) IBOutlet UIImageView *siteImageView;
+
+@property (weak, nonatomic) IBOutlet UILabel *siteNameLabel;
+
+@property (weak, nonatomic) IBOutlet UILabel *siteDistance;
+
+@property (weak, nonatomic) IBOutlet UIView *siteView;
+
+//缩放View
+@property (weak, nonatomic) IBOutlet UIView *zoomView;
+
 @end
 
 @implementation YYReturnViewController
@@ -100,13 +113,9 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     
     self.search = [[AMapSearchAPI alloc] init];
     self.search.delegate = self;
-    
-//    YYTips1View *tips1View = [[YYTips1View alloc] init];
-//    tips1View.delegate = self;
-//    tips1View.frame = CGRectMake(0, 74, kScreenWidth, 158);
-//    tips1View.hidden = YES;
-//    self.tipsView = tips1View;
-//    [self.view addSubview:self.tipsView];
+    self.siteView.hidden = YES;
+    self.zoomView.layer.cornerRadius = 17;
+    self.zoomView.layer.masksToBounds = YES;
 }
 
 - (void)initAnnotations
@@ -193,8 +202,15 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
             weakSelf.lastPostion = coordinate;
             weakSelf.bikeSiteModels = [YYBikeSiteModel modelArrayWithDictArray:response];
             [weakSelf.mapView removeAnnotations:weakSelf.annotations];
+            if (weakSelf.bikeSiteModels.count <= 0) {
+                return;
+            }
+           
             weakSelf.annotations = [NSMutableArray array];
-            
+            weakSelf.siteView.hidden = NO;
+            weakSelf.siteDistance.text = [NSString stringWithFormat:@"%.2f 米",[weakSelf.bikeSiteModels[0].distance floatValue]];
+            weakSelf.siteNameLabel.text =  weakSelf.bikeSiteModels[0].address;
+            [weakSelf.siteImageView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",kBaseURL,weakSelf.bikeSiteModels[0].img1]]];
             for (int i = 0; i < weakSelf.bikeSiteModels.count; ++i)
             {
                 MAPointAnnotation *a1 = [[MAPointAnnotation alloc] init];
@@ -204,7 +220,8 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
             }
             
             if (weakSelf.annotations.count > 0) {
-                [weakSelf.mapView addAnnotations:self.annotations];
+                [weakSelf.mapView addAnnotations:weakSelf.annotations];
+                [weakSelf.mapView selectAnnotation:weakSelf.annotations[0] animated:YES];
             }
         }else{
             [QMUITips showWithText:message inView:weakSelf.view hideAfterDelay:2];
@@ -213,6 +230,63 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
         
     }];
     
+}
+
+#pragma mark - 去还车
+- (IBAction)returnBikeButtonClick:(id)sender {
+    YYOrderInfoView *orderInfoView = [[YYOrderInfoView alloc] init];
+    orderInfoView.rsid = self.bikeSiteModels[0].ID;
+    orderInfoView.userModel = self.userModel;
+    orderInfoView.delegate = self;
+    orderInfoView.siteName = self.bikeSiteModels[0].name;
+    
+    YYOrderInfoRequest *request = [[YYOrderInfoRequest alloc] init];
+    request.rsid = self.bikeSiteModels[0].ID;
+    request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kOrderPriceAPI];
+    __weak __typeof(self)weakSelf = self;
+    [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
+        if (success) {
+            UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
+            contentView.backgroundColor = UIColorWhite;
+            contentView.layer.cornerRadius = 6;
+            
+            orderInfoView.resultModel = [YYReturnResultModel modelWithDictionary:response];
+            QMUIModalPresentationViewController *modalViewController = [[QMUIModalPresentationViewController alloc] init];
+            modalViewController.contentView = orderInfoView;
+            modalViewController.maximumContentViewWidth = kScreenWidth;
+            modalViewController.animationStyle = QMUIModalPresentationAnimationStyleFade;
+            weakSelf.modalPrentViewController = modalViewController;
+            [modalViewController showWithAnimated:YES completion:nil];
+        }else{
+            if (self.bikeSiteModels.count > 0) {
+                //1.将两个经纬度点转成投影点
+                MAMapPoint point1 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weakSelf.bikeSiteModels[0].latitude,weakSelf.bikeSiteModels[0].longitude));
+                MAMapPoint point2 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weakSelf.mapView.userLocation.coordinate.latitude,weakSelf.mapView.userLocation.coordinate.longitude));
+                //2.计算距离
+                CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
+                QMUILog(@"distance ===== %.f",distance);
+                YYTips1View *tipsView = [[YYTips1View alloc] init];
+                tipsView.feedBackBlock = ^{
+                    [QMUIModalPresentationViewController hideAllVisibleModalPresentationViewControllerIfCan];
+                    YYFeedBackController *feedbackViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"feedBack"];
+                    [weakSelf.navigationController pushViewController:feedbackViewController animated:YES];
+                };
+                tipsView.distanceLabel.text = [NSString stringWithFormat:@"再骑%.0f米到达还车点",distance];
+                UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
+                contentView.backgroundColor = UIColorWhite;
+                contentView.layer.cornerRadius = 6;
+                QMUIModalPresentationViewController *modalViewController = [[QMUIModalPresentationViewController alloc] init];
+                modalViewController.contentView = tipsView;
+                modalViewController.maximumContentViewWidth = kScreenWidth;
+                modalViewController.animationStyle = QMUIModalPresentationAnimationStyleFade;
+                weakSelf.modalPrentViewController = modalViewController;
+                [modalViewController showWithAnimated:YES completion:nil];
+            }
+            
+        }
+    } error:^(NSError *error) {
+        
+    }];
 }
 
 
@@ -336,7 +410,7 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
         orderInfoView.siteName = self.bikeSiteModels[0].name;
         
         YYOrderInfoRequest *request = [[YYOrderInfoRequest alloc] init];
-        request.rsid = self.models[self.selectedId].ID;
+        request.rsid = self.bikeSiteModels[0].ID;
         request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kOrderPriceAPI];
         __weak __typeof(self)weakSelf = self;
         [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
@@ -361,6 +435,11 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
                     CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
                     QMUILog(@"distance ===== %.f",distance);
                     YYTips1View *tipsView = [[YYTips1View alloc] init];
+                    tipsView.feedBackBlock = ^{
+                        [QMUIModalPresentationViewController hideAllVisibleModalPresentationViewControllerIfCan];
+                        YYFeedBackController *feedbackViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"feedBack"];
+                        [weakSelf.navigationController pushViewController:feedbackViewController animated:YES];
+                    };
                     tipsView.distanceLabel.text = [NSString stringWithFormat:@"再骑%.0f米到达还车点",distance];
                     UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
                     contentView.backgroundColor = UIColorWhite;
@@ -450,6 +529,61 @@ static NSString *reuseIndetifier = @"annotationReuseIndetifier";
     
 }
 
+
+-(void) orderInfoView:(YYOrderInfoView *)orderView didClickOKButton:(UIButton *)sender
+{
+    [self.modalPrentViewController hideWithAnimated:YES completion:^(BOOL finished) {
+        YYReturnBikeRequest *request = [[YYReturnBikeRequest alloc] init];
+        request.nh_url = [NSString stringWithFormat:@"%@%@",kBaseURL,kReturnBikeAPI];
+        request.rsid = orderView.rsid;
+        __weak __typeof(self)weakSelf = self;
+        [QMUITips showLoadingInView:self.view];
+        [request nh_sendRequestWithCompletion:^(id response, BOOL success, NSString *message) {
+            [QMUITips hideAllToastInView:self.view animated:YES];
+            if (success) {
+                weakSelf.resultModel = [YYReturnResultModel modelWithDictionary:response];
+                QMUITips *tips = [QMUITips createTipsToView:[UIApplication sharedApplication].keyWindow];
+                QMUIToastContentView *contentView = (QMUIToastContentView *)tips.contentView;
+                contentView.minimumSize = CGSizeMake(200, 100);
+                [tips showSucceed:message hideAfterDelay:2];
+                [weakSelf.navigationController popToRootViewControllerAnimated:YES];
+            }else{
+                if ([message isEqualToString:@"车辆不在站点, 请到指定站点还车"]) {
+                    if (self.models.count > 0) {
+                        //1.将两个经纬度点转成投影点
+                        MAMapPoint point1 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weakSelf.bikeSiteModels[0].latitude,weakSelf.bikeSiteModels[0].longitude));
+                        MAMapPoint point2 = MAMapPointForCoordinate(CLLocationCoordinate2DMake(weakSelf.mapView.userLocation.coordinate.latitude,weakSelf.mapView.userLocation.coordinate.longitude));
+                        //2.计算距离
+                        CLLocationDistance distance = MAMetersBetweenMapPoints(point1,point2);
+                        QMUILog(@"distance ===== %.f",distance);
+                        YYTips1View *tipsView = [[YYTips1View alloc] init];
+                        tipsView.feedBackBlock = ^{
+                            [QMUIModalPresentationViewController hideAllVisibleModalPresentationViewControllerIfCan];
+                            YYFeedBackController *feedbackViewController = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"feedBack"];
+                            [weakSelf.navigationController pushViewController:feedbackViewController animated:YES];
+                        };
+                        tipsView.distanceLabel.text = [NSString stringWithFormat:@"再骑%.0f米到达还车点",distance];
+                        UIView *contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 300, 400)];
+                        contentView.backgroundColor = UIColorWhite;
+                        contentView.layer.cornerRadius = 6;
+                        QMUIModalPresentationViewController *modalViewController = [[QMUIModalPresentationViewController alloc] init];
+                        modalViewController.contentView = tipsView;
+                        modalViewController.maximumContentViewWidth = kScreenWidth;
+                        modalViewController.animationStyle = QMUIModalPresentationAnimationStyleFade;
+                        weakSelf.modalPrentViewController = modalViewController;
+                        [modalViewController showWithAnimated:YES completion:nil];
+                    }
+                }else{
+                    [QMUITips showError:message inView:weakSelf.view hideAfterDelay:2];
+                }
+                
+                
+            }
+        } error:^(NSError *error) {
+            [QMUITips hideAllToastInView:self.view animated:YES];
+        }];
+    }];
+}
 
 - (BOOL)shouldCustomNavigationBarTransitionIfBarHiddenable
 {
